@@ -1,0 +1,221 @@
+---
+title: "Tests Statistiques"
+author: "Pablo FW"
+date: "6 juillet 2020"
+output:
+  html_document:
+    df_print: paged
+  pdf_document: default
+  word_document: default
+---
+
+# Données 
+
+```{r echo=FALSE}
+library(readxl)
+data <- read_excel("results-Enq_FCPE_dataV2.xlsx")
+
+datavilles <- read_excel("results-Enq_FCPE_datavilles2.xlsx")
+```
+# Etudes univariées des caractéristiques ciblées : 
+```{r echo=FALSE}
+table(data$Type_de_famille)
+```
+
+On peut noter une très forte importance de familles en couple dans la population des répondants. 
+
+```{r echo=FALSE}
+
+table(data$Lien_avec_l_enfant_ou_les_enfants)
+
+```
+On peut noter que les répondants sont dans la grandde majorité des cas des mères. 
+1859/2320
+```{r echo=FALSE}
+
+table(data$Mon_age)
+
+
+```
+On remarque que la majorité des répondants est concentré dans les occurences correspondants aux ages de 30 à 49 ans. 
+
+```{r echo=FALSE}
+table(data$Situation_professionnelle)
+
+```
+La répartition des effectifs de cette variable est davantage équilibrée que les précédentes, on peut tout de même noter que environ deux tiers des répondants sont en train de travailler malgré le confinement.
+
+```{r echo=FALSE}
+
+table(data$Nombre_d_enfants)
+
+```
+On constate que la quasi totalité des répondants ont 1 à 3 enfants, le reste ne représente que 124/2320 résultats de l'enquête
+```{r echo=FALSE}
+
+table(datavilles$TypeEtablissement1)
+
+```
+On voit que la majorité des parents d'élève ayant répondu ont des enfants allant de l'école primaire au lycée. 
+la part des répondant ayant un enfant en lycée professionnelle est minime et en creche est unique.
+
+
+# Croisement des caractéristiques familiales avec la variable Avis (ou Position)
+
+## Avis - Situation familiale
+
+```{r echo=FALSE}
+x1<-data$Position
+y1<-data$Type_de_famille
+
+tab<-  table(y1,x1)
+tab
+freq <- prop.table(tab)*100
+freq
+
+khi2<-chisq.test(tab)
+khi2
+khi2r<-khi2$residuals
+khi2r
+
+```
+On peut relever une p value trop importante, L'hypothèse d'indépendance de la variable Type de famille avec la variable avis est donc vérifiée.
+On remarque une forte contribution au Khi 2 des occurences de la variable Famille Monoparentale (garde alternée).
+
+
+## Avis - lien de parenté
+```{r echo=FALSE}
+x1<-data$Position
+y1<-data$Lien_avec_l_enfant_ou_les_enfants
+
+tab<-  table(y1,x1)
+#suppression parents autre car trop peu, fausse le test
+tab<-tab[-1,] 
+tab
+freq <- prop.table(tab)*100
+freq
+
+khi2<-chisq.test(tab)
+khi2
+khi2r<-khi2$residuals
+khi2r
+```
+On peut relever une p value relativement proche de 0, L'hypothèse d'indépendance de la variable Type de famille avec la variable avis est donc rejetée. les contributions au Khi2 sont principalement sur la population du père.
+les "Père" semblent donc un peu moins défavorables que les "Mère" à la reprise de l'école
+
+
+
+
+## Avis - Age
+```{r echo=FALSE}
+x1<-data$Position
+y1<-data$Mon_age
+
+tab<-  table(y1,x1)
+tab2<-tab[-1,]
+tab2<-tab2[-4,]
+tab 
+tab2
+
+freq <- prop.table(tab)*100
+freq
+
+khi2<-chisq.test(tab)
+khi2
+khi22<-chisq.test(tab2)
+khi22
+khi2r<-khi2$residuals
+khi2r
+khi22r<-khi22$residuals
+khi22r
+```
+On obtient une p-value encore une fois proche de 0. 
+Les deux variables ne sont donc pas indépendantes l'une de l'autre. 
+On peut également noter que les "40-49" et "50-59" sont prop un peu moins défavorables à la reprise de l'école que les autres classe d'âges.
+Les contributions au Khi 2 sont les plus remarquables pour les personnes de 30 à 39ans et entre 50 et 59ans. 
+
+## Avis - Situation Professionnelle
+```{r echo=FALSE}
+x1<-data$Position
+y1<-data$Situation_professionnelle
+
+tab<-  table(y1,x1)
+tab
+freq <- prop.table(tab)*100
+freq
+
+khi2<-chisq.test(tab)
+khi2
+khi2r<-khi2$residuals
+khi2r
+```
+La p-value est également ici proche de 0, la situation professionnelle est donc liée avec l'avis des répondants. 
+On peut remaquer que les personnes qui sont en "Télétravail" et surtout "Travail à l'extérieur" sont moins défavorables à la reprise de l'école (On peut supposer que cela découle du fait que cela résout leur problèmes de garde pour les derniers, de devoirs à faire faire aux enfants en même temps que leur télétravail aux premiers.)
+On remarque clairement que les répondant travaillant à l'extérieur ont plus de contribution au Khi2.
+
+## Avis - nb enfants
+```{r echo=FALSE}
+x1<-data$Position
+y1<-data$Nombre_d_enfants
+
+tab<-  table(y1,x1)
+tab
+freq <- prop.table(tab)*100
+freq
+
+khi2<-chisq.test(tab)
+khi2
+khi2r<-khi2$residuals
+khi2r
+
+tab<-tab[-9,]
+tab<-tab[-8,]
+tab<-tab[-7,]
+tab<-tab[-6,]
+tab<-tab[-5,]
+khi2<-chisq.test(tab)
+khi2
+khi2r<-khi2$residuals
+khi2r
+
+```
+Ici on voit que la p value n'est pas significative car elle dépasse le seuil de 0,5. L'hypothèse d'indépendance des deux variables est donc vérifiée.
+
+## Avis - niveau scolaire (pop: enfants)
+```{r echo=FALSE}
+x1<-datavilles$Position
+y1<-datavilles$TypeEtablissement1
+
+tab<-  table(y1,x1)
+
+tab
+freq <- prop.table(tab)*100
+freq
+
+khi2<-chisq.test(tab)
+khi2
+khi2r<-khi2$residuals
+khi2r
+tab<-tab[-2,]
+tab<-tab[-5,]
+tab
+khi2<-chisq.test(tab)
+khi2
+khi2r<-khi2$residuals
+khi2r
+
+
+```
+
+Si l'on écarte les occurence crêches et lycée pro. Qui présente des effectifs trop faible pour le test du X² , on pourrait écarter l'hypothèse d'indépendance de ces deux variables.
+On peut noter que l'occurence "lycée" a une forte contribution au Khi2
+
+
+Conclusion : 
+Les caractéristiques en lien avec l'avis des parents sont : 
+- Lien de parenté
+- L'âge
+- Situation pro.
+- Niveau scolaire
+
+en revanche, le type de famille ainsi que le nombre d'enfants n'influe pas sur les avis parentaux.
