@@ -1,0 +1,1 @@
+![Aperçu de l'application](Screenshot.png)
